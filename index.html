@@ -1,0 +1,366 @@
+
+<script>
+    function alertMe(){
+        alert("This site is full of viruses,do you still wanna enter?")
+
+    }
+    function showDate(){
+        document.getElementById("datePlaceholder").innerHTML = Date()  }
+
+</script>
+<div id="datePlaceHolder">
+
+</div>
+
+<button onClick="showDate()">free codes of popular games</button>
+
+
+<index>
+    <head >
+     <h1>___Coduri pentru incepatori in python(Ursina)___</h1> 
+     <h2>___site-ul original -> https://www.ursinaengine.org/___</h2>
+     <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <H1>_________________________________________
+            __________________________________________
+            __________________________________________
+            __________________________________________
+            __________________________________________
+            >_________________________________________
+            __________________________________________
+            __________________________________________
+            __________________________________________
+            __________________________________________
+            ___________________________________________
+            __________________________________________
+            __________________________________________
+        </H1>
+    <h2>___1.Inventar___</h2>
+    <h2>Acesta este un inventar care poate fi folosit pentru un joc</h2>
+    <img src="" alt="" class="imp">
+    <code style="    white-space: pre-wrap;    "> from ursina import *
+    
+
+        class Inventory(Entity):
+            def __init__(self, **kwargs):
+                super().__init__(
+                    parent = camera.ui,
+                    model = Quad(radius=.015),
+                    texture = 'white_cube',
+                    texture_scale = (5,8),
+                    scale = (.5, .8),
+                    origin = (-.5, .5),
+                    position = (-.3,.4),
+                    color = color.color(0,0,.1,.9),
+                    )
+        
+                for key, value in kwargs.items():
+                    setattr(self, key, value)
+        
+        
+            def find_free_spot(self):
+                for y in range(8):
+                    for x in range(5):
+                        grid_positions = [(int(e.x*self.texture_scale[0]), int(e.y*self.texture_scale[1])) for e in self.children]
+                        print(grid_positions)
+        
+                        if not (x,-y) in grid_positions:
+                            print('found free spot:', x, y)
+                            return x, y
+        
+        
+            def append(self, item, x=0, y=0):
+                print('add item:', item)
+        
+                if len(self.children) >= 5*8:
+                    print('inventory full')
+                    error_message = Text('<red>Inventory is full!', origin=(0,-1.5), x=-.5, scale=2)
+                    destroy(error_message, delay=1)
+                    return
+        
+                x, y = self.find_free_spot()
+        
+                icon = Draggable(
+                    parent = self,
+                    model = 'quad',
+                    texture = item,
+                    color = color.white,
+                    scale_x = 1/self.texture_scale[0],
+                    scale_y = 1/self.texture_scale[1],
+                    origin = (-.5,.5),
+                    x = x * 1/self.texture_scale[0],
+                    y = -y * 1/self.texture_scale[1],
+                    z = -.5,
+                    )
+                name = item.replace('_', ' ').title()
+        
+                if random.random() < .25:
+                    icon.color = color.gold
+                    name = '<orange>Rare ' + name
+        
+                icon.tooltip = Tooltip(name)
+                icon.tooltip.background.color = color.color(0,0,0,.8)
+        
+        
+                def drag():
+                    icon.org_pos = (icon.x, icon.y)
+                    icon.z -= .01   # ensure the dragged item overlaps the rest
+        
+                def drop():
+                    icon.x = int((icon.x + (icon.scale_x/2)) * 5) / 5
+                    icon.y = int((icon.y - (icon.scale_y/2)) * 8) / 8
+                    icon.z += .01
+        
+                    # if outside, return to original position
+                    if icon.x < 0 or icon.x >= 1 or icon.y > 0 or icon.y <= -1:
+                        icon.position = (icon.org_pos)
+                        return
+        
+                    # if the spot is taken, swap positions
+                    for c in self.children:
+                        if c == icon:
+                            continue
+        
+                        if c.x == icon.x and c.y == icon.y:
+                            print('swap positions')
+                            c.position = icon.org_pos
+        
+        
+                icon.drag = drag
+                icon.drop = drop
+        
+        
+        
+        
+        if __name__ == '__main__':
+            app = Ursina()
+            inventory = Inventory()
+        
+            def add_item():
+                inventory.append(random.choice(('bag', 'bow_arrow', 'gem', 'orb', 'sword')))
+        
+            add_item()
+            add_item()
+            add_item_button = Button(
+                scale = (.1,.1),
+                x = -.5,
+                color = color.lime.tint(-.25),
+                text = '+',
+                tooltip = Tooltip('Add random item'),
+                on_click = add_item
+                )
+            bg = Entity(parent=camera.ui, model='quad', texture='shore', scale_x=camera.aspect_ratio, z=1)
+            Cursor(texture='cursor', scale=.1)
+            mouse.visible = False
+            window.exit_button.visible = False
+            window.fps_counter.enabled = False
+            app.run()</code>
+            <H1>_________________________________________
+                __________________________________________
+                __________________________________________
+                _________________________________________
+            </H1>
+            <h2>2.X si 0</h2>
+            <h1>Acest joc iti permite sa joci X si 0 cu AI</h1>
+            <code style="    white-space: pre-wrap;    "></codestyle>>
+                from ursina import *
+
+if __name__ == '__main__':
+    app = Ursina()
+
+camera.orthographic = True
+camera.fov = 4
+camera.position = (1, 1)
+Text.default_resolution *= 2
+
+player = Entity(name='o', color=color.azure)
+cursor = Tooltip(player.name, color=player.color, origin=(0,0), scale=4, enabled=True)
+cursor.background.color = color.clear
+bg = Entity(parent=scene, model='quad', texture='shore', scale=(16,8), z=10, color=color.light_gray)
+mouse.visible = False
+
+# create a matrix to store the buttons in. makes it easier to check for victory
+board = [[None for x in range(3)] for y in range(3)]
+
+for y in range(3):
+    for x in range(3):
+        b = Button(parent=scene, position=(x,y))
+        board[x][y] = b
+
+        def on_click(b=b):
+            b.text = player.name
+            b.color = player.color
+            b.collision = False
+            check_for_victory()
+
+            if player.name == 'o':
+                player.name = 'x'
+                player.color = color.orange
+            else:
+                player.name = 'o'
+                player.color = color.azure
+
+            cursor.text = player.name
+            cursor.color = player.color
+
+        b.on_click = on_click
+
+
+def check_for_victory():
+    name = player.name
+
+    won = (
+    (board[0][0].text == name and board[1][0].text == name and board[2][0].text == name) or # across the bottom
+    (board[0][1].text == name and board[1][1].text == name and board[2][1].text == name) or # across the middle
+    (board[0][2].text == name and board[1][2].text == name and board[2][2].text == name) or # across the top
+    (board[0][0].text == name and board[0][1].text == name and board[0][2].text == name) or # down the left side
+    (board[1][0].text == name and board[1][1].text == name and board[1][2].text == name) or # down the middle
+    (board[2][0].text == name and board[2][1].text == name and board[2][2].text == name) or # down the right side
+    (board[0][0].text == name and board[1][1].text == name and board[2][2].text == name) or # diagonal /
+    (board[0][2].text == name and board[1][1].text == name and board[2][0].text == name))   # diagonal \
+
+    if won:
+        print('winner is:', name)
+        destroy(cursor)
+        mouse.visible = True
+        Panel(z=1, scale=10, model='quad')
+        t = Text(f'player\n{name}\nwon!', scale=3, origin=(0,0), background=True)
+        t.create_background(padding=(.5,.25), radius=Text.size/2)
+        t.background.color = player.color.tint(-.2)
+
+if __name__ == '__main__':
+    app.run()
+    <a> href= https://github.com/pokepetter/ursina/blob/master/samples/inventory.py</a>
+            </code>
+
+            <h2> 3.Platformer Game(schita)</h2>
+            <h1>acest joc iti permite sa joci un first person shooter</h1>
+
+            <code style="    white-space: pre-wrap;    "></codestyle>>> 
+                from ursina import *
+from ursina.prefabs.first_person_controller import FirstPersonController
+from ursina.shaders import lit_with_shadows_shader
+
+app = Ursina()
+
+random.seed(0)
+Entity.default_shader = lit_with_shadows_shader
+
+ground = Entity(model='plane', collider='box', scale=64, texture='grass', texture_scale=(4,4))
+
+editor_camera = EditorCamera(enabled=False, ignore_paused=True)
+player = FirstPersonController(model='cube', z=-10, color=color.orange, origin_y=-.5, speed=8, collider='box')
+player.collider = BoxCollider(player, Vec3(0,1,0), Vec3(1,2,1))
+
+gun = Entity(model='cube', parent=camera, position=(.5,-.25,.25), scale=(.3,.2,1), origin_z=-.5, color=color.red, on_cooldown=False)
+gun.muzzle_flash = Entity(parent=gun, z=1, world_scale=.5, model='quad', color=color.yellow, enabled=False)
+
+shootables_parent = Entity()
+mouse.traverse_target = shootables_parent
+
+
+for i in range(16):
+    Entity(model='cube', origin_y=-.5, scale=2, texture='brick', texture_scale=(1,2),
+        x=random.uniform(-8,8),
+        z=random.uniform(-8,8) + 8,
+        collider='box',
+        scale_y = random.uniform(2,3),
+        color=color.hsv(0, 0, random.uniform(.9, 1))
+        )
+
+def update():
+    if held_keys['left mouse']:
+        shoot()
+
+def shoot():
+    if not gun.on_cooldown:
+        # print('shoot')
+        gun.on_cooldown = True
+        gun.muzzle_flash.enabled=True
+        from ursina.prefabs.ursfx import ursfx
+        ursfx([(0.0, 0.0), (0.1, 0.9), (0.15, 0.75), (0.3, 0.14), (0.6, 0.0)], volume=0.5, wave='noise', pitch=random.uniform(-13,-12), pitch_change=-12, speed=3.0)
+        invoke(gun.muzzle_flash.disable, delay=.05)
+        invoke(setattr, gun, 'on_cooldown', False, delay=.15)
+        if mouse.hovered_entity and hasattr(mouse.hovered_entity, 'hp'):
+            mouse.hovered_entity.hp -= 10
+            mouse.hovered_entity.blink(color.red)
+
+
+from ursina.prefabs.health_bar import HealthBar
+
+class Enemy(Entity):
+    def __init__(self, **kwargs):
+        super().__init__(parent=shootables_parent, model='cube', scale_y=2, origin_y=-.5, color=color.light_gray, collider='box', **kwargs)
+        self.health_bar = Entity(parent=self, y=1.2, model='cube', color=color.red, world_scale=(1.5,.1,.1))
+        self.max_hp = 100
+        self.hp = self.max_hp
+
+    def update(self):
+        dist = distance_xz(player.position, self.position)
+        if dist > 40:
+            return
+
+        self.health_bar.alpha = max(0, self.health_bar.alpha - time.dt)
+
+
+        self.look_at_2d(player.position, 'y')
+        hit_info = raycast(self.world_position + Vec3(0,1,0), self.forward, 30, ignore=(self,))
+        # print(hit_info.entity)
+        if hit_info.entity == player:
+            if dist > 2:
+                self.position += self.forward * time.dt * 5
+
+    @property
+    def hp(self):
+        return self._hp
+
+    @hp.setter
+    def hp(self, value):
+        self._hp = value
+        if value <= 0:
+            destroy(self)
+            return
+
+        self.health_bar.world_scale_x = self.hp / self.max_hp * 1.5
+        self.health_bar.alpha = 1
+
+# Enemy()
+enemies = [Enemy(x=x*4) for x in range(4)]
+
+
+def pause_input(key):
+    if key == 'tab':    # press tab to toggle edit/play mode
+        editor_camera.enabled = not editor_camera.enabled
+
+        player.visible_self = editor_camera.enabled
+        player.cursor.enabled = not editor_camera.enabled
+        gun.enabled = not editor_camera.enabled
+        mouse.locked = not editor_camera.enabled
+        editor_camera.position = player.position
+
+        application.paused = editor_camera.enabled
+
+pause_handler = Entity(ignore_paused=True, input=pause_input)
+
+
+sun = DirectionalLight()
+sun.look_at(Vec3(1,-1,-1))
+Sky()
+
+app.run()
+            </code>
+
+        
+    </body>
+
+    <footer>
+        <h3>A fost de folos?</h3> 
+        <form>
+            <input type="radio" id="html" name="fav_language" value="HTML">
+            <label for="html">Da</label><br>
+            <input type="radio" id="css" name="fav_language" value="CSS">
+            <label for="css">Nu</label><br>
+          </form>
+    </footer>
+</index>
